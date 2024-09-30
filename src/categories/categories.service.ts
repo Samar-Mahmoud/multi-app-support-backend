@@ -27,7 +27,21 @@ export class CategoriesService {
 
   async findOne(categoryId: ObjectId) {
     const doc = await this.categoryModel.findById(categoryId);
-    return doc ?? 'not found';
+    if (!doc) {
+      throw new BadRequestException(`category ${categoryId} not found`);
+    }
+    const subCategories = await this.categoryModel.find(
+      {
+        parentCategoryId: categoryId,
+      },
+      {
+        parentCategoryId: 0,
+      },
+    );
+    return {
+      category: doc,
+      subCategories,
+    };
   }
 
   async update({
@@ -38,10 +52,14 @@ export class CategoriesService {
     updateCategoryDto: UpdateCategoryDto;
   }) {
     try {
-      return (await this.categoryModel.updateOne(
-        { _id: categoryId },
-        updateCategoryDto,
-      )).matchedCount == 0 ? 'not found' : 'updated successfully';
+      return (
+        await this.categoryModel.updateOne(
+          { _id: categoryId },
+          updateCategoryDto,
+        )
+      ).matchedCount == 0
+        ? 'not found'
+        : 'updated successfully';
     } catch (err) {
       throw new BadRequestException(err.message);
     }
