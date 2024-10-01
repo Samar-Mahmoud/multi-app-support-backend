@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types, ObjectId } from 'mongoose';
+import { Types, ObjectId, model } from 'mongoose';
+import { Product } from '../products/products.schema';
 
 @Schema()
 export class Vendor {

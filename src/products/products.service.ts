@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './products.dto';
-import { Model, ObjectId } from 'mongoose';
+import { Model, Types, ObjectId } from 'mongoose';
 import { Product } from './products.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Vendor } from '../vendors/vendors.schema';
@@ -28,8 +28,20 @@ export class ProductsService {
         });
       } else {
         try {
-          const doc = new this.productModel(product);
-          await doc.save();
+          if (product._id) {
+            const doc = new this.productModel({
+              ...product,
+              _id: new Types.ObjectId(product._id),
+              vendorId: new Types.ObjectId(product.vendorId),
+            });
+            await doc.save();
+          } else {
+            const doc = new this.productModel({
+              ...product,
+              vendorId: new Types.ObjectId(product.vendorId),
+            });
+            await doc.save();
+          }
         } catch (err) {
           errors.push({ product: product.name, error: err.message });
         }
@@ -78,8 +90,12 @@ export class ProductsService {
     const { deletedCount } = await this.productModel.deleteOne({
       _id: productId,
     });
-    return deletedCount === 0
+    return !deletedCount
       ? new NotFoundException(`product ${productId} not found`)
       : 'deleted successfully';
+  }
+
+  async deleteVendorProducts(vendorId: Types.ObjectId | ObjectId) {
+    await this.productModel.deleteMany({ vendorId });
   }
 }

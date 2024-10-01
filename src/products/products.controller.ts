@@ -17,6 +17,7 @@ import {
 import { ZodValidationPipe } from '../pipes/validation.pipe';
 import { z } from 'zod';
 import { ObjectId } from 'mongoose';
+import { ParseObjectIdPipe } from '../pipes/objectId.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -30,22 +31,19 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
-  @Get()
-  findVendorProducts(
-    @Body(new ZodValidationPipe(z.object({ vendorId: z.string().optional() })))
-    { vendorId }: { vendorId?: ObjectId },
-  ) {
-    return this.productsService.findVendorProducts(vendorId);
+  @Get('info/:id')
+  findOne(@Param('id', ParseObjectIdPipe) productId: ObjectId) {
+    return this.productsService.findOne(productId);
   }
 
   @Get(':id')
-  findOne(@Param('id') productId: ObjectId) {
-    return this.productsService.findOne(productId);
+  findVendorProducts(@Param('id', ParseObjectIdPipe) vendorId: ObjectId) {
+    return this.productsService.findVendorProducts(vendorId);
   }
 
   @Patch(':id')
   update(
-    @Param('id') productId: ObjectId,
+    @Param('id', ParseObjectIdPipe) productId: ObjectId,
     @Body(new ZodValidationPipe(updateProductSchema))
     updateProductDto: UpdateProductDto,
   ) {
@@ -56,7 +54,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  delete(@Param('id') productId: ObjectId) {
+  delete(@Param('id', ParseObjectIdPipe) productId: ObjectId) {
     return this.productsService.delete(productId);
   }
 }

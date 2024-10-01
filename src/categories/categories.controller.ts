@@ -17,6 +17,7 @@ import {
   updateCategorySchema,
 } from './categories.dto';
 import { ZodValidationPipe } from '../pipes/validation.pipe';
+import { ParseObjectIdPipe } from '../pipes/objectId.pipe';
 
 @Controller('categories')
 export class CategoriesController {
@@ -36,13 +37,13 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') categoryId: ObjectId) {
+  findOne(@Param('id', ParseObjectIdPipe) categoryId: ObjectId) {
     return this.categoriesService.findOne(categoryId);
   }
 
   @Patch(':id')
   update(
-    @Param('id') categoryId: ObjectId,
+    @Param('id', ParseObjectIdPipe) categoryId: ObjectId,
     @Body(new ZodValidationPipe(updateCategorySchema))
     updateCategoryDto: UpdateCategoryDto,
   ) {
@@ -53,7 +54,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  delete(@Param('id') categoryId: ObjectId) {
+  delete(@Param('id', ParseObjectIdPipe) categoryId: ObjectId) {
     return this.categoriesService.delete(categoryId);
   }
 }

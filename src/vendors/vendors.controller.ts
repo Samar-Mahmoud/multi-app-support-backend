@@ -16,7 +16,8 @@ import {
 } from './vendors.dto';
 import { ZodValidationPipe } from '../pipes/validation.pipe';
 import { z } from 'zod';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
+import { ParseObjectIdPipe } from '../pipes/objectId.pipe';
 
 @Controller('vendors')
 export class VendorsController {
@@ -30,24 +31,21 @@ export class VendorsController {
     return this.vendorsService.create(createVendorDto);
   }
 
-  @Get()
+  @Get('info/:id')
+  findOne(@Param('id', ParseObjectIdPipe) vendorId: ObjectId) {
+    return this.vendorsService.findOne(vendorId);
+  }
+
+  @Get(':id')
   findCategoryVendors(
-    @Body(
-      new ZodValidationPipe(z.object({ categoryId: z.string().optional() })),
-    )
-    { categoryId }: { categoryId?: ObjectId },
+    @Param('id', ParseObjectIdPipe) categoryId: ObjectId,
   ) {
     return this.vendorsService.findCategoryVendors(categoryId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') vendorId: ObjectId) {
-    return this.vendorsService.findOne(vendorId);
-  }
-
   @Patch(':id')
   update(
-    @Param('id') vendorId: ObjectId,
+    @Param('id', ParseObjectIdPipe) vendorId: ObjectId,
     @Body(new ZodValidationPipe(updateVendorSchema))
     updateVendorDto: UpdateVendorDto,
   ) {
@@ -58,7 +56,7 @@ export class VendorsController {
   }
 
   @Delete(':id')
-  delete(@Param('id') vendorId: ObjectId) {
+  delete(@Param('id', ParseObjectIdPipe) vendorId: ObjectId) {
     return this.vendorsService.delete(vendorId);
   }
 }

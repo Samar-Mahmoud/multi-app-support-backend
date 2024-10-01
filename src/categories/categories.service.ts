@@ -1,8 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './categories.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './categories.schema';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { VendorsService } from '../vendors/vendors.service';
 
 @Injectable()
@@ -13,12 +17,25 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto[]) {
-    try {
-      const doc = await this.categoryModel.create(createCategoryDto);
-      return doc;
-    } catch (err) {
-      return new BadRequestException(err.message);
+    const errors: { category: string; error: string }[] = [];
+
+    for (const category of createCategoryDto) {
+      try {
+        if (category._id) {
+          const doc = new this.categoryModel({
+            ...category,
+            _id: new Types.ObjectId(category._id),
+          });
+          await doc.save();
+        } else {
+          const doc = new this.categoryModel(category);
+          await doc.save();
+        }
+      } catch (err) {
+        errors.push({ category: category.name, error: err.message });
+      }
     }
+    return errors.length ? { errors } : 'created successfully';
   }
 
   async findAll(parentCategoryId?: ObjectId) {
@@ -73,14 +90,18 @@ export class CategoriesService {
     }
   }
 
-  // TODO: delete vendors, products
   async delete(categoryId: ObjectId) {
-    return (
-      await this.categoryModel.deleteOne({
-        _id: categoryId,
-      })
-    ).deletedCount === 0
-      ? 'not found'
-      : 'deleted successfully';
+    const { deletedCount } = await this.categoryModel.deleteOne({
+      _id: categoryId,
+    });
+    if (!deletedCount) {
+      throw new NotFoundException(`category ${categoryId} not found`);
+    }
+    try {
+      await this.vendorsService.deleteCategoryVendors(categoryId);
+      return 'deleted successfully';
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 }
