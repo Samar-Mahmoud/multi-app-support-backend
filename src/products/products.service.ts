@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './products.dto';
 import { Model, Types, ObjectId } from 'mongoose';
-import { Product } from './products.schema';
+import { Product } from './product.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Vendor } from '../vendors/vendors.schema';
+import { Vendor } from '../vendors/vendor.schema';
 
 @Injectable()
 export class ProductsService {
@@ -87,15 +87,23 @@ export class ProductsService {
   }
 
   async delete(productId: ObjectId) {
-    const { deletedCount } = await this.productModel.deleteOne({
-      _id: productId,
-    });
-    return !deletedCount
-      ? new NotFoundException(`product ${productId} not found`)
-      : 'deleted successfully';
+    try {
+      const { deletedCount } = await this.productModel.deleteOne({
+        _id: productId,
+      });
+      return !deletedCount
+        ? new NotFoundException(`product ${productId} not found`)
+        : 'deleted successfully';
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   async deleteVendorProducts(vendorId: Types.ObjectId | ObjectId) {
-    await this.productModel.deleteMany({ vendorId });
+    try {
+      await this.productModel.deleteMany({ vendorId });
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 }

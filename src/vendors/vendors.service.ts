@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { CreateVendorDto, UpdateVendorDto } from './vendors.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Vendor } from './vendors.schema';
+import { Vendor } from './vendor.schema';
 import { Model, ObjectId, Types } from 'mongoose';
-import { Category } from '../categories/categories.schema';
+import { Category } from '../categories/category.schema';
 import { ProductsService } from '../products/products.service';
 
 @Injectable()

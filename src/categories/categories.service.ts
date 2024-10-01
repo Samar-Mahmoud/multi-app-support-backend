@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './categories.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Category } from './categories.schema';
+import { Category } from './category.schema';
 import { Model, ObjectId, Types } from 'mongoose';
 import { VendorsService } from '../vendors/vendors.service';
 

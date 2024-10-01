@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { VendorsController } from './vendors.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Vendor, VendorSchema } from './vendors.schema';
-import { Category, CategorySchema } from '../categories/categories.schema';
+import { Vendor, VendorSchema } from './vendor.schema';
+import { Category, CategorySchema } from '../categories/category.schema';
 import { ProductsModule } from '../products/products.module';
 
 @Module({
