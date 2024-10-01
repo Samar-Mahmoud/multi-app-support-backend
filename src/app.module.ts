@@ -6,6 +6,7 @@ import { validate } from './env.validation';
 import { CategoriesModule } from './categories/categories.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VendorsModule } from './vendors/vendors.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { VendorsModule } from './vendors/vendors.module';
       })
     }),
     CategoriesModule,
-    VendorsModule
+    VendorsModule,
+    ProductsModule
   ],
   controllers: [AppController],
   providers: [AppService],

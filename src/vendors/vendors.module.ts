@@ -4,6 +4,7 @@ import { VendorsController } from './vendors.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Vendor, VendorSchema } from './vendors.schema';
 import { Category, CategorySchema } from '../categories/categories.schema';
+import { ProductsModule } from '../products/products.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { Category, CategorySchema } from '../categories/categories.schema';
       { name: Vendor.name, schema: VendorSchema },
       { name: Category.name, schema: CategorySchema },
     ]),
+    ProductsModule,
   ],
   controllers: [VendorsController],
   providers: [VendorsService],

@@ -8,12 +8,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Vendor } from './vendors.schema';
 import { Model, ObjectId } from 'mongoose';
 import { Category } from '../categories/categories.schema';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class VendorsService {
   constructor(
     @InjectModel(Vendor.name) private vendorModel: Model<Vendor>,
     @InjectModel(Category.name) private categoryModel: Model<Category>,
+    private productsService: ProductsService,
   ) {}
 
   async create(createVendorDto: CreateVendorDto[]) {
@@ -47,9 +49,10 @@ export class VendorsService {
     if (!vendor) {
       throw new NotFoundException(`vendor ${vendorId} not found`);
     }
-    // TODO: return vendor's products
+    const products = this.productsService.findVendorProducts(vendorId);
     return {
       vendor,
+      products,
     };
   }
 
@@ -74,6 +77,7 @@ export class VendorsService {
     }
   }
 
+  // TODO: delete products
   async delete(vendorId: ObjectId) {
     return (
       await this.vendorModel.deleteOne({
