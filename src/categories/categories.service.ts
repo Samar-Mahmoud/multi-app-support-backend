@@ -2,12 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './categories.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './categories.schema';
-import { Model, ObjectId, Document } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
+import { VendorsService } from '../vendors/vendors.service';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private categoryModel: Model<Category>,
+    private vendorsService: VendorsService,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto[]) {
@@ -20,9 +22,13 @@ export class CategoriesService {
   }
 
   async findAll(parentCategoryId?: ObjectId) {
-    return await this.categoryModel.find({
-      parentCategoryId: parentCategoryId ?? null,
-    });
+    return await this.categoryModel.find(
+      parentCategoryId
+        ? {
+            parentCategoryId,
+          }
+        : {},
+    );
   }
 
   async findOne(categoryId: ObjectId) {
@@ -38,9 +44,11 @@ export class CategoriesService {
         parentCategoryId: 0,
       },
     );
+    const vendors = await this.vendorsService.findCategoryVendors(categoryId);
     return {
       category: doc,
       subCategories,
+      vendors,
     };
   }
 
@@ -65,6 +73,7 @@ export class CategoriesService {
     }
   }
 
+  // TODO: delete vendors, products
   async delete(categoryId: ObjectId) {
     return (
       await this.categoryModel.deleteOne({
