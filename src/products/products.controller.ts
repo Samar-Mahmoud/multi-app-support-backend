@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { ObjectId } from 'mongoose';
 import { ParseObjectIdPipe } from '../pipes/objectId.pipe';
 
-@Controller('products')
+@Controller('categories/:categoryId/vendors/:vendorId/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -31,14 +31,14 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
-  @Get('info/:id')
-  findOne(@Param('id', ParseObjectIdPipe) productId: ObjectId) {
-    return this.productsService.findOne(productId);
+  @Get()
+  findVendorProducts(@Param('vendorId', ParseObjectIdPipe) vendorId: ObjectId) {
+    return this.productsService.findVendorProducts(vendorId);
   }
 
   @Get(':id')
-  findVendorProducts(@Param('id', ParseObjectIdPipe) vendorId: ObjectId) {
-    return this.productsService.findVendorProducts(vendorId);
+  findOne(@Param('id', ParseObjectIdPipe) productId: ObjectId) {
+    return this.productsService.findOne(productId);
   }
 
   @Patch(':id')
