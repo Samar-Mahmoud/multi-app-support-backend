@@ -16,6 +16,12 @@ export class CategoriesService {
     private vendorsService: VendorsService,
   ) {}
 
+  /**
+   * creates category documents
+   * @param {CreateCategoryDto[]} createCategoryDto an array of objects that represent the data needed to create new categories
+   * @returns if there are any errors during the creation process, an object containing the category name and error message
+   * for each error will be returned. Otherwise, a success message will be returned
+   */
   async create(createCategoryDto: CreateCategoryDto[]) {
     const errors: { category: string; error: string }[] = [];
 
@@ -38,7 +44,14 @@ export class CategoriesService {
     return errors.length ? { errors } : 'created successfully';
   }
 
+  /**
+   * retrieves all categories with an optional parent category ID filter for sub-categories
+   * @param {ObjectId} [parentCategoryId] optional parameter to return the sub-categories of the `parentCategoryId` category
+   * @returns if `parentCategoryId` is provided, the sub-categories of the `parentCategoryId` category will be returned.
+   * Otherwise, all categories and subcategories will be returned
+   */
   async findAll(parentCategoryId?: ObjectId) {
+    // TODO: return categories as a tree
     return await this.categoryModel.find(
       parentCategoryId
         ? {
@@ -48,6 +61,12 @@ export class CategoriesService {
     );
   }
 
+  /**
+   * retrieves a category document by ID, along with its subcategories and associated vendors
+   * @param {ObjectId} categoryId ID of the category document to find
+   * @returns an object with three properties `category` the category found, `subCategories` array of the sub-categories
+   * of the found category, and `vendors` array of vendors associated to the found category
+   */
   async findOne(categoryId: ObjectId) {
     const doc = await this.categoryModel.findById(categoryId);
     if (!doc) {
@@ -69,6 +88,12 @@ export class CategoriesService {
     };
   }
 
+  /**
+   * updates a category based on its ID
+   * @param - an object with two properties `categoryId` ID of the category document to update and `updateCategoryDto`
+   * the object that contains the data to update with
+   * @returns a string value based on the result of updating a category in the database
+   */
   async update({
     categoryId,
     updateCategoryDto,
@@ -90,6 +115,11 @@ export class CategoriesService {
     }
   }
 
+  /**
+   * deletes a category and its related subcategories and vendors
+   * @param {ObjectId} categoryId ID of the category document to delete
+   * @returns a success message if the document is deleted. Otherwise, throws not found exception
+   */
   async delete(categoryId: ObjectId) {
     try {
       const { deletedCount } = await this.categoryModel.deleteOne({

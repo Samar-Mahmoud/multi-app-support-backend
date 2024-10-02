@@ -1,3 +1,6 @@
+/*
+ * the status values for an order process
+ */
 export const ORDER = [
   'pending',
   'confirmed',

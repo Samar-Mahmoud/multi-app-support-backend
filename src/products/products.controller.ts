@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
@@ -23,6 +24,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { USER } from '../users/users.types';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthedRequest } from '../auth/auth.types';
 
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('categories/:categoryId/vendors/:vendorId/products')
@@ -80,7 +82,10 @@ export class ProductsController {
 
   @Delete(':id')
   @Roles([USER.ADMIN, USER.SALES, USER.VENDOR])
-  delete(@Param('id', ParseObjectIdPipe) productId: ObjectId) {
-    return this.productsService.delete(productId);
+  delete(
+    @Param('id', ParseObjectIdPipe) productId: ObjectId,
+    @Req() req: AuthedRequest,
+  ) {
+    return this.productsService.delete(productId, req.user);
   }
 }

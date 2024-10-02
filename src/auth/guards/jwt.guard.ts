@@ -8,6 +8,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
+/*
+ * the JwtGuard verifies a JWT token from the request header to authenticate and authorize users
+ */
 @Injectable()
 export class JwtGuard implements CanActivate {
   constructor(

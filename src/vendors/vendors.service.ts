@@ -18,6 +18,13 @@ export class VendorsService {
     private productsService: ProductsService,
   ) {}
 
+  /**
+   * creates vendors for a specific category
+   * @param {ObjectId} categoryId the category to whom the vendors will be associated
+   * @param {CreateVendorDto[]} createVendorDto an array of objects containing data for creating vendors
+   * @returns if there are any errors during the creation process, an object containing the vendor name and error message
+   * for each error will be returned. Otherwise, a success message will be returned
+   */
   async create(categoryId: ObjectId, createVendorDto: CreateVendorDto[]) {
     const errors: { vendor: string; error: string }[] = [];
 
@@ -52,10 +59,21 @@ export class VendorsService {
     return errors.length ? { errors } : 'created successfully';
   }
 
-  async findCategoryVendors(categoryId?: ObjectId) {
-    return await this.vendorModel.find(categoryId ? { categoryId } : {});
+  /**
+   * finds vendors belonging to a specific category based on the provided category ID
+   * @param {ObjectId} [categoryId] - ID of the category to search for vendors associated with that specific category
+   * @returns vendors belonging to the `categoryId` category
+   */
+  async findCategoryVendors(categoryId: ObjectId) {
+    return await this.vendorModel.find({ categoryId });
   }
 
+  /**
+   * retrieves a vendor by its ID, along with its products
+   * @param {ObjectId} vendorId ID of the vendor document to find
+   * @returns an object with two properties `vendor` the vendor found and `products` array of products associated
+   * to the found vendor
+   */
   async findOne(vendorId: ObjectId) {
     const vendor = await this.vendorModel.findById(vendorId);
     if (!vendor) {
@@ -68,6 +86,12 @@ export class VendorsService {
     };
   }
 
+  /**
+   * updates a vendor based on its ID
+   * @param - an object with two properties `vendorId` ID of the vendor document to update and `updateVendorDto`
+   * the object that contains the data to update with
+   * @returns a success message if the document is updated. Otherwise, throws an exception
+   */
   async update({
     vendorId,
     updateVendorDto,
@@ -89,6 +113,11 @@ export class VendorsService {
     }
   }
 
+  /**
+   * deletes a vendor by its ID
+   * @param {ObjectId} vendorId ID of the vendor document to delete
+   * @returns a success message if the document is deleted. Otherwise, throws an exception
+   */
   async delete(vendorId: ObjectId) {
     const { deletedCount } = await this.vendorModel.deleteOne({
       _id: vendorId,
@@ -104,6 +133,10 @@ export class VendorsService {
     }
   }
 
+  /**
+   * deletes all vendors associated with a specific category ID and products related to those vendors
+   * @param {Types.ObjectId | ObjectId} categoryId the category whose vendors need to be deleted
+   */
   async deleteCategoryVendors(categoryId: ObjectId) {
     const vendors = await this.vendorModel.find(
       { categoryId },

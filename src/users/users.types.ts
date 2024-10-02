@@ -1,3 +1,6 @@
+/*
+ * different user roles
+ */
 export const USER = {
   CUSTOMER: 'customer',
   VENDOR: 'vendor',

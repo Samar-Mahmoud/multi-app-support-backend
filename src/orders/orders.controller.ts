@@ -66,7 +66,7 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  @Roles([USER.ADMIN, USER.VENDOR])
+  @Roles([USER.ADMIN, USER.VENDOR, USER.CUSTOMER])
   delete(
     @Param('id', ParseObjectIdPipe) orderId: ObjectId,
     @Req() req: AuthedRequest,

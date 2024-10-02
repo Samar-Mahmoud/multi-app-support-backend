@@ -3,7 +3,9 @@ import { Reflector } from '@nestjs/core';
 import { Roles } from '../decorators/roles.decorator';
 import { AuthedRequest } from '../auth.types';
 
-// compare the current user's role to the roles required by the current route being processed
+/*
+ * the RolesGuard compares the current user's role to the roles required by the current route being processed
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
