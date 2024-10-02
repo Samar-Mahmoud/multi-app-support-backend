@@ -16,15 +16,15 @@ export class ProductsService {
     @InjectModel(Vendor.name) private vendorModel: Model<Vendor>,
   ) {}
 
-  async create(createProductDto: CreateProductDto[]) {
+  async create(vendorId: ObjectId, createProductDto: CreateProductDto[]) {
     const errors: { product: string; error: string }[] = [];
 
     for (const product of createProductDto) {
-      const vendor = await this.vendorModel.findById(product.vendorId);
+      const vendor = await this.vendorModel.findById(vendorId);
       if (!vendor) {
         errors.push({
           product: product.name,
-          error: `vendor ${product.vendorId} not found`,
+          error: `vendor ${vendorId} not found`,
         });
       } else {
         try {
@@ -32,13 +32,13 @@ export class ProductsService {
             const doc = new this.productModel({
               ...product,
               _id: new Types.ObjectId(product._id),
-              vendorId: new Types.ObjectId(product.vendorId),
+              vendorId,
             });
             await doc.save();
           } else {
             const doc = new this.productModel({
               ...product,
-              vendorId: new Types.ObjectId(product.vendorId),
+              vendorId,
             });
             await doc.save();
           }

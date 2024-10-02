@@ -18,15 +18,15 @@ export class VendorsService {
     private productsService: ProductsService,
   ) {}
 
-  async create(createVendorDto: CreateVendorDto[]) {
+  async create(categoryId: ObjectId, createVendorDto: CreateVendorDto[]) {
     const errors: { vendor: string; error: string }[] = [];
 
     for (const vendor of createVendorDto) {
-      const category = await this.categoryModel.findById(vendor.categoryId);
+      const category = await this.categoryModel.findById(categoryId);
       if (!category) {
         errors.push({
           vendor: vendor.name,
-          error: `category ${vendor.categoryId} not found`,
+          error: `category ${categoryId} not found`,
         });
         continue;
       }
@@ -35,13 +35,13 @@ export class VendorsService {
           const doc = new this.vendorModel({
             ...vendor,
             _id: new Types.ObjectId(vendor._id),
-            categoryId: new Types.ObjectId(vendor.categoryId),
+            categoryId,
           });
           await doc.save();
         } else {
           const doc = new this.vendorModel({
             ...vendor,
-            categoryId: new Types.ObjectId(vendor.categoryId),
+            categoryId,
           });
           await doc.save();
         }

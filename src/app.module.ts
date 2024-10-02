@@ -15,20 +15,20 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate, 
+      validate,
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('DB_URI'),
-      })
+      }),
     }),
     CategoriesModule,
     VendorsModule,
     ProductsModule,
     UsersModule,
     OrdersModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

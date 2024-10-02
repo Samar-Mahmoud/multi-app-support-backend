@@ -1,4 +1,13 @@
-export const USER = [
+export const USER = {
+  CUSTOMER: 'customer',
+  VENDOR: 'vendor',
+  RIDER: 'rider',
+  ADMIN: 'admin',
+  TECH_SUPPORT: 'tech support',
+  SALES: 'sales',
+} as const;
+
+export const USER_ROLES_ARR = [
   'customer',
   'vendor',
   'rider',
@@ -7,4 +16,6 @@ export const USER = [
   'sales',
 ] as const;
 
-export type USER_ROLES = (typeof USER)[number];
+type UserT = typeof USER;
+
+export type USER_ROLES = UserT[keyof UserT];

@@ -1,8 +1,10 @@
 import { USER_ROLES } from '../users/users.types';
 
+export type RequestUser = {
+  userId: string;
+  userRole: USER_ROLES;
+};
+
 export type AuthedRequest = Request & {
-  user: {
-    sub: string;
-    role: USER_ROLES;
-  };
+  user: RequestUser;
 };
