@@ -56,6 +56,10 @@ export class UsersService {
     return await this.userModel.findById(userId, { password: 0 });
   }
 
+  async findOneByEmail(email: string) {
+    return await this.userModel.findOne({ email });
+  }
+
   async update({
     userId,
     updateUserDto,

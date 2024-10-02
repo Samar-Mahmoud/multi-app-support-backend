@@ -18,5 +18,11 @@ export const updateUserSchema = z
   })
   .partial();
 
+export const loginUserSchema = z.object({
+  email: z.string().min(1),
+  password: z.string().min(1),
+});
+
 export type CreateUserDto = z.infer<typeof createUserSchema>;
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;
+export type LoginUserDto = z.infer<typeof loginUserSchema>;

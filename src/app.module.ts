@@ -18,7 +18,6 @@ import { AuthModule } from './auth/auth.module';
       validate, 
     }),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('DB_URI'),
