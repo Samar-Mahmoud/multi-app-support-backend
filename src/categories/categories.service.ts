@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './categories.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Category } from './category.schema';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Connection, Model, ObjectId, Types } from 'mongoose';
 import { VendorsService } from '../vendors/vendors.service';
 
 @Injectable()
@@ -14,6 +14,7 @@ export class CategoriesService {
   constructor(
     @InjectModel(Category.name) private categoryModel: Model<Category>,
     private vendorsService: VendorsService,
+    @InjectConnection() private connection: Connection,
   ) {}
 
   /**
@@ -121,20 +122,40 @@ export class CategoriesService {
    * @returns a success message if the document is deleted. Otherwise, throws not found exception
    */
   async delete(categoryId: ObjectId) {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
     try {
-      const { deletedCount } = await this.categoryModel.deleteOne({
-        _id: categoryId,
-      });
+      const { deletedCount } = await this.categoryModel.deleteOne(
+        {
+          _id: categoryId,
+        },
+        { session },
+      );
       if (!deletedCount) {
         throw new NotFoundException(`category ${categoryId} not found`);
       }
+      const subCategories = await this.findAll(categoryId);
       // delete subcategories
-      await this.categoryModel.deleteMany({ parentCategoryId: categoryId });
+      await this.categoryModel.deleteMany(
+        { parentCategoryId: categoryId },
+        { session },
+      );
       // delete category's vendors
-      await this.vendorsService.deleteCategoryVendors(categoryId);
+      await this.vendorsService.deleteCategoryVendors(categoryId, { session });
+      // delete sub-categories' vendors
+      for (const category of subCategories) {
+        await this.vendorsService.deleteCategoryVendors(category._id, {
+          session,
+        });
+      }
+      await session.commitTransaction();
       return 'deleted successfully';
     } catch (err) {
+      await session.abortTransaction();
       throw new BadRequestException(err.message);
+    } finally {
+      await session.endSession();
     }
   }
 }

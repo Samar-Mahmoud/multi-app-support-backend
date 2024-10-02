@@ -6,7 +6,7 @@ import {
 import { CreateVendorDto, UpdateVendorDto } from './vendors.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Vendor } from './vendor.schema';
-import { Model, ObjectId, Types } from 'mongoose';
+import { ClientSession, Model, ObjectId, Types } from 'mongoose';
 import { Category } from '../categories/category.schema';
 import { ProductsService } from '../products/products.service';
 
@@ -136,16 +136,20 @@ export class VendorsService {
   /**
    * deletes all vendors associated with a specific category ID and products related to those vendors
    * @param {Types.ObjectId | ObjectId} categoryId the category whose vendors need to be deleted
+   * @param options optional parameter to pass the session used in transaction
    */
-  async deleteCategoryVendors(categoryId: ObjectId) {
+  async deleteCategoryVendors(
+    categoryId: Types.ObjectId | ObjectId,
+    options?: { session: ClientSession },
+  ) {
     const vendors = await this.vendorModel.find(
       { categoryId },
       { _id: 1, categoryId: 0, description: 0, location: 0, name: 0 },
     );
     for (const vendor of vendors) {
       try {
-        await this.vendorModel.deleteOne({ _id: vendor._id });
-        await this.productsService.deleteVendorProducts(vendor._id);
+        await this.vendorModel.deleteOne({ _id: vendor._id }, options);
+        await this.productsService.deleteVendorProducts(vendor._id, options);
       } catch (err) {
         throw new BadRequestException(err.messge);
       }

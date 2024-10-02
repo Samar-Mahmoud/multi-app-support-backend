@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './products.dto';
-import { Model, Types, ObjectId } from 'mongoose';
+import { Model, Types, ObjectId, ClientSession } from 'mongoose';
 import { Product } from './product.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Vendor } from '../vendors/vendor.schema';
@@ -143,10 +143,14 @@ export class ProductsService {
   /**
    * deletes all products associated with a specific vendor ID
    * @param {Types.ObjectId | ObjectId} vendorId the vendor whose products need to be deleted
+   * @param options optional parameter to pass the session used in transaction
    */
-  async deleteVendorProducts(vendorId: Types.ObjectId | ObjectId) {
+  async deleteVendorProducts(
+    vendorId: Types.ObjectId | ObjectId,
+    options?: { session: ClientSession },
+  ) {
     try {
-      await this.productModel.deleteMany({ vendorId });
+      await this.productModel.deleteMany({ vendorId }, options);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
