@@ -48,8 +48,12 @@ export class UsersService {
     }
   }
 
-  async findAll(userRole: USER_ROLES) {
+  async findRoleUsers(userRole: USER_ROLES) {
     return await this.userModel.find({ role: userRole }, { password: 0 });
+  }
+
+  async findAll() {
+    return await this.userModel.find({}, { password: 0 });
   }
 
   async findOne(userId: ObjectId) {

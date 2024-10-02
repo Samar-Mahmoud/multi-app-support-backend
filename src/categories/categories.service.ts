@@ -91,13 +91,16 @@ export class CategoriesService {
   }
 
   async delete(categoryId: ObjectId) {
-    const { deletedCount } = await this.categoryModel.deleteOne({
-      _id: categoryId,
-    });
-    if (!deletedCount) {
-      throw new NotFoundException(`category ${categoryId} not found`);
-    }
     try {
+      const { deletedCount } = await this.categoryModel.deleteOne({
+        _id: categoryId,
+      });
+      if (!deletedCount) {
+        throw new NotFoundException(`category ${categoryId} not found`);
+      }
+      // delete subcategories
+      await this.categoryModel.deleteMany({ parentCategoryId: categoryId });
+      // delete category's vendors
       await this.vendorsService.deleteCategoryVendors(categoryId);
       return 'deleted successfully';
     } catch (err) {
